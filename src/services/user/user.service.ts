@@ -1,26 +1,50 @@
-import { Injectable } from '@nestjs/common';
-import { User } from 'src/models/user';
+import { Injectable, BadRequestException, NotImplementedException } from '@nestjs/common';
+import { UserRepository } from 'src/mongo/repository/user.repository';
+import { User } from 'src/mongo/models/user/user.schema';
+import { UserDto } from 'src/mongo/models/user/user.dto';
 
 @Injectable()
 export class UserService {
-    private readonly users: User[];
 
-    constructor() {
-        this.users = [
-            { userId: 1, userLogin: 'John', userName: "John Johnisson", password: '123' },
-            { userId: 2, userLogin: 'Smith', userName: "Smith Smithsson", password: 'aaa' }
-        ]
+    constructor(private readonly userRepository: UserRepository) {
     }
 
-    async getUserById(id: String): Promise<User | undefined> {
-        const parsedId = Number(id);
-        const user = this.users.find(user => user.userId === parsedId);
+    async getAllUsers(): Promise<User[] | undefined> {
+        return await this.userRepository.get();
+    }
+
+    async getUserById(id: string): Promise<User | undefined> {
+        const user = await this.userRepository.getById(id);
         if (user) { return user; }
-        else return null;
+
+        throw new BadRequestException(`There's no user with id ${id}`);
     }
 
-    async findUser(userLogin: String): Promise<User | undefined> {
-        // Simulando conexão com o mongo
-        return this.users.find(user => user.userLogin === userLogin);
+    async findUser(userLogin: string, password: string): Promise<User | undefined> {
+        return await this.userRepository.getByLogin(userLogin, password);
+    }
+
+    async createUser(newUser: UserDto): Promise<string> {
+        const alreadyExistingUser = await this.userRepository.getByLogin(newUser.userLogin, newUser.password);
+
+        if (alreadyExistingUser) {
+            throw new BadRequestException('This username already exists!');
+        }
+
+        await this.userRepository.create(newUser);
+
+        return 'User successfully created!';
+    }
+
+    async updateUser(updateUser: UserDto, id: string): Promise<string> {
+        await this.userRepository.update(updateUser, id);
+
+        return 'User successfully updated!';
+    }
+
+    async deleteUser(id: string): Promise<string> {
+        await this.userRepository.delete(id);
+
+        return 'User successfully deleted!';
     }
 }

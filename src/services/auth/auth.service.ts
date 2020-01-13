@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 
@@ -6,28 +6,16 @@ import { JwtService } from '@nestjs/jwt';
 export class AuthService {
     constructor(
         private readonly userService: UserService,
-        private readonly jwtService: JwtService
-    ) { }
+        private readonly jwtService: JwtService) { }
 
-    async validateUser(userLogin: String, password: String): Promise<any> {
-        const user = await this.userService.findUser(userLogin);
+    async login(user: any): Promise<any> {
+        const payload = await this.userService.findUser(user.userLogin, user.password);
 
-        if (user && user.password === password) {
-            return user;
-        }
-
-        return null;
-    }
-
-    async login(user: any) {
-        const payload = await this.validateUser(user.userLogin, user.password);
-
-        if (!payload) {
-            throw new UnauthorizedException("The given user doesn't exists!");
-        }
+        if (!payload) { throw new BadRequestException('Incorrect Credentials!'); }
 
         return {
-            access_token: this.jwtService.sign(payload)
+            access_token: this.jwtService.sign(payload),
+            _id: payload._id,
         };
     }
 
