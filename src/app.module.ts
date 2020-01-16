@@ -15,6 +15,7 @@ import { UserActivityController } from './controllers/user-activity/user-activit
 import { UserActivityService } from './services/user-activity/user-activity.service';
 import { MediaSchema } from './mongo/schemas/media.schema';
 import { UserActivityRepository } from './mongo/repository/user-activity.repository';
+import { WebsocketGateway } from './websocket/websocket.gateway';
 
 // Enabling Mongo Debug
 mongoose.set('debug', true);
@@ -31,6 +32,6 @@ mongoose.set('debug', true);
     MulterModule.register(),
   ],
   controllers: [AuthController, UserController, UserActivityController],
-  providers: [AuthService, UserService, UserActivityService, JwtStrategy, UserActivityRepository, UserRepository],
+  providers: [AuthService, UserService, UserActivityService, JwtStrategy, UserActivityRepository, UserRepository, WebsocketGateway],
 })
 export class AppModule { }

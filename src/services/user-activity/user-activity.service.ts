@@ -1,19 +1,20 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { UserActivityRepository } from 'src/mongo/repository/user-activity.repository';
 import { isNull } from 'util';
-import { ImageUploadDto } from 'src/domain/media/image-upload.dto';
-import { MediaComment } from 'src/domain/media/media-comments.dto';
 import { readFileSync } from 'fs';
 import { Media } from 'src/mongo/schemas/media.schema';
 import { UserService } from '../user/user.service';
-import { LikeOrDislikeDto } from 'src/domain/media/like-dislike.dto';
-import { PostCommentDto } from 'src/domain/media/post-comment.dto';
+import { ImageUploadDto } from 'src/domain/dto/media/image-upload.dto';
+import { MediaCommentViewModel } from 'src/domain/view-model/media/media-comment.viewmodel';
+import { LikeOrDislikeViewModel } from 'src/domain/view-model/media/like-dislike.viewmodel';
+import { WebsocketGateway } from 'src/websocket/websocket.gateway';
 
 @Injectable()
 export class UserActivityService {
     constructor(
         private readonly userActivityRepository: UserActivityRepository,
-        private readonly userService: UserService) {
+        private readonly userService: UserService,
+        private readonly websocketGateway: WebsocketGateway) {
     }
 
     async postImage(userId: string, filename: string, description: string) {
@@ -31,7 +32,7 @@ export class UserActivityService {
 
         if (!isNull(description) && description !== '') {
             imageUploadDto.mediaComments.push(
-                new MediaComment(userId, user.userName, description),
+                new MediaCommentViewModel(userId, user.userName, description),
             );
         }
 
@@ -59,31 +60,34 @@ export class UserActivityService {
         }));
     }
 
-    async likeOrDislikePost(likeOrDislikeDto: LikeOrDislikeDto) {
+    async likeOrDislikeMedia(likeOrDislike: LikeOrDislikeViewModel) {
 
-        const post = await this.userActivityRepository.getById(likeOrDislikeDto.postId);
-        if (isNull(post)) { throw new BadRequestException('A Post with the given PostId could not be found'); }
+        const media = await this.userActivityRepository.getById(likeOrDislike.mediaId);
+        if (isNull(media)) { throw new BadRequestException('A Post with the given PostId could not be found'); }
 
-        if (post.likes.map(x => x.toString()).includes(likeOrDislikeDto.userId)) {
-            post.likes = post.likes.filter(x => x.toString() !== likeOrDislikeDto.userId);
+        if (media.likes.includes(likeOrDislike.userId)) {
+            media.likes = media.likes.filter(x => x !== likeOrDislike.userId);
         } else {
-            post.likes = post.likes.concat(likeOrDislikeDto.userId);
+            media.likes = media.likes.concat(likeOrDislike.userId);
         }
 
-        await this.userActivityRepository.update(post);
+        await this.userActivityRepository.update(media);
+
+        const likeCount = media.likes.length.toString();
+        this.websocketGateway.notifyConnectedClients(likeCount);
 
         return 'Activity successfully liked/disliked!';
     }
 
-    async postComment(postCommentDto: PostCommentDto) {
+    async postComment(postCommentDto: MediaCommentViewModel) {
 
-        const post = await this.userActivityRepository.getById(postCommentDto.postId);
+        const post = await this.userActivityRepository.getById(postCommentDto.mediaId);
         if (isNull(post)) { throw new BadRequestException('A Post with the given PostId could not be found'); }
 
         const user = await this.userService.getUserById(postCommentDto.userId);
         if (isNull(user)) { throw new BadRequestException('An user with the given UserId was not found '); }
 
-        post.mediaComments = post.mediaComments.concat(new MediaComment(postCommentDto.userId, user.userName, postCommentDto.comment));
+        post.mediaComments = post.mediaComments.concat(new MediaCommentViewModel(postCommentDto.userId, user.userName, postCommentDto.comment));
 
         await this.userActivityRepository.update(post);
 

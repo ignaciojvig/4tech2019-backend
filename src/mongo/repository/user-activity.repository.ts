@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User } from '../schemas/user.schema';
-import { UserDto } from '../../domain/user/user.dto';
 import { Media } from '../schemas/media.schema';
-import { ImageUploadDto } from 'src/domain/media/image-upload.dto';
+import { ImageUploadDto } from 'src/domain/dto/media/image-upload.dto';
 
 @Injectable()
 export class UserActivityRepository {

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from '../schemas/user.schema';
-import { UserDto } from '../../domain/user/user.dto';
+import { UserViewModel } from '../../domain/view-model/user/user.viewmodel';
 
 @Injectable()
 export class UserRepository {
@@ -31,12 +31,12 @@ export class UserRepository {
             .lean();
     }
 
-    async create(userDto: UserDto): Promise<User> {
+    async create(userDto: UserViewModel): Promise<User> {
         const newUser = this.userSchema(userDto);
         return await newUser.save();
     }
 
-    async update(updateUser: UserDto, id: string): Promise<User> {
+    async update(updateUser: UserViewModel, id: string): Promise<User> {
         const updatedUser = await this.userSchema.findOneAndUpdate({ _id: id }, updateUser);
         return await updatedUser.save();
     }

@@ -1,19 +1,19 @@
 import * as mongoose from 'mongoose';
 import { Document } from 'mongoose';
-import { MediaComment } from '../../domain/media/media-comments.dto';
+import { MediaCommentViewModel } from 'src/domain/view-model/media/media-comment.viewmodel';
 
 export interface Media extends Document {
     readonly _id: mongoose.Schema.Types.ObjectId;
-    readonly userId: mongoose.Schema.Types.ObjectId;
+    readonly userId: string;
     readonly userName: string;
     readonly filename: string;
-    mediaComments: MediaComment[];
-    likes: mongoose.Schema.Types.ObjectId[];
+    mediaComments: MediaCommentViewModel[];
+    likes: string[];
     readonly timestamp: Date;
 }
 
 const MediaCommentSchema = new mongoose.Schema({
-    userId: mongoose.Schema.Types.ObjectId,
+    userId: String,
     userName: String,
     comment: String,
     timestamp: {
@@ -23,10 +23,10 @@ const MediaCommentSchema = new mongoose.Schema({
 });
 
 export const MediaSchema = new mongoose.Schema({
-    userId: mongoose.Schema.Types.ObjectId,
+    userId: String,
     userName: String,
     filename: String,
-    likes: [mongoose.Schema.Types.ObjectId],
+    likes: [String],
     timestamp: {
         type: Date,
         default: Date.now(),

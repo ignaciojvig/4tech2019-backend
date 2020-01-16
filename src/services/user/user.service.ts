@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, NotImplementedException } from '@nestjs/common';
 import { UserRepository } from 'src/mongo/repository/user.repository';
 import { User } from 'src/mongo/schemas/user.schema';
-import { UserDto } from 'src/domain/user/user.dto';
+import { UserViewModel } from 'src/domain/view-model/user/user.viewmodel';
 
 @Injectable()
 export class UserService {
@@ -24,7 +24,7 @@ export class UserService {
         return await this.userRepository.getByLogin(userLogin, password);
     }
 
-    async createUser(newUser: UserDto): Promise<string> {
+    async createUser(newUser: UserViewModel): Promise<string> {
 
         const alreadyExistingUser = await this.userRepository.getByLogin(newUser.userLogin, newUser.password);
 
@@ -37,7 +37,7 @@ export class UserService {
         return 'User successfully created!';
     }
 
-    async updateUser(updateUser: UserDto, id: string): Promise<string> {
+    async updateUser(updateUser: UserViewModel, id: string): Promise<string> {
         await this.userRepository.update(updateUser, id);
 
         return 'User successfully updated!';

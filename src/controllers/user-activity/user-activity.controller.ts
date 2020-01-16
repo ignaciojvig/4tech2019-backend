@@ -5,8 +5,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { extname } from 'path';
 import { diskStorage } from 'multer';
 import { ParseParamPipe } from 'src/pipes/parse-param.pipe';
-import { LikeOrDislikeDto } from 'src/domain/media/like-dislike.dto';
-import { PostCommentDto } from 'src/domain/media/post-comment.dto';
+import { LikeOrDislikeViewModel } from 'src/domain/view-model/media/like-dislike.viewmodel';
+import { MediaCommentViewModel } from 'src/domain/view-model/media/media-comment.viewmodel';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('user-activity')
@@ -20,13 +20,13 @@ export class UserActivityController {
     }
 
     @Put('like-or-dislike')
-    likeOrDislikePost(@Body() likeOrDislikeDto: LikeOrDislikeDto) {
-        return this.userActivityService.likeOrDislikePost(likeOrDislikeDto);
+    likeOrDislikeMedia(@Body() likeOrDislike: LikeOrDislikeViewModel) {
+        return this.userActivityService.likeOrDislikeMedia(likeOrDislike);
     }
 
     @Put('comment-in-activity')
-    postCommentInActivity(@Body() postCommentDto: PostCommentDto) {
-        return this.userActivityService.postComment(postCommentDto);
+    postCommentInActivity(@Body() postComment: MediaCommentViewModel) {
+        return this.userActivityService.postComment(postComment);
     }
 
     @Post('upload')
