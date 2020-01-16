@@ -74,7 +74,7 @@ export class UserActivityService {
         await this.userActivityRepository.update(media);
 
         const likeCount = media.likes.length.toString();
-        this.websocketGateway.notifyConnectedClients(likeCount);
+        this.websocketGateway.notifyConnectedClients(media._id, likeCount);
 
         return 'Activity successfully liked/disliked!';
     }

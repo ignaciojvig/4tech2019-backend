@@ -11,7 +11,7 @@ dotenv.config();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // app.useGlobalFilters(new ExceptionHandlerFilter());
+  app.useGlobalFilters(new ExceptionHandlerFilter());
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   const options = new DocumentBuilder()
