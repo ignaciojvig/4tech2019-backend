@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, NotImplementedException } from '@nestjs/common';
 import { UserRepository } from 'src/mongo/repository/user.repository';
-import { User } from 'src/mongo/models/user/user.schema';
-import { UserDto } from 'src/mongo/models/user/user.dto';
+import { User } from 'src/mongo/schemas/user.schema';
+import { UserDto } from 'src/domain/user/user.dto';
 
 @Injectable()
 export class UserService {
@@ -25,6 +25,7 @@ export class UserService {
     }
 
     async createUser(newUser: UserDto): Promise<string> {
+
         const alreadyExistingUser = await this.userRepository.getByLogin(newUser.userLogin, newUser.password);
 
         if (alreadyExistingUser) {

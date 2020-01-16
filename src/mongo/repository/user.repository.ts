@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User } from '../models/user/user.schema';
-import { UserDto } from '../models/user/user.dto';
+import { User } from '../schemas/user.schema';
+import { UserDto } from '../../domain/user/user.dto';
 
 @Injectable()
 export class UserRepository {
@@ -18,7 +18,7 @@ export class UserRepository {
 
     async getById(id: string): Promise<User> {
         return await this.userSchema
-            .find({ _id: id })
+            .findOne({ _id: id })
             .select({ __v: false, userLogin: false, password: false })
             .lean();
     }

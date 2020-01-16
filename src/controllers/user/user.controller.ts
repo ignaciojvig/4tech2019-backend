@@ -1,7 +1,7 @@
 import { Controller, Get, UseGuards, Param, Post, Body, Put, Delete, BadRequestException } from '@nestjs/common';
 import { UserService } from 'src/services/user/user.service';
 import { AuthGuard } from '@nestjs/passport';
-import { UserDto } from 'src/mongo/models/user/user.dto';
+import { UserDto } from 'src/domain/user/user.dto';
 
 @Controller('user')
 export class UserController {
