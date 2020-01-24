@@ -22,8 +22,8 @@ export class WebsocketGateway {
     console.log('User Disconnected');
   }
 
-  notifyConnectedClients(mediaId: string, numberOfLikes: string) {
-    this.server.emit('events', { mediaId, numberOfLikes });
+  notifyConnectedClients(mediaId: string, userId: string) {
+    this.server.emit('events', { mediaId, userId });
   }
 
 }

@@ -7,6 +7,7 @@ export class ImageUploadDto {
         this.userId = userId;
         this.userName = userName;
         this.filename = filename;
+        this.timestamp = new Date();
         this.mediaComments = [];
     }
 
@@ -15,6 +16,8 @@ export class ImageUploadDto {
     readonly filename: string;
 
     readonly userName: string;
+
+    readonly timestamp: Date;
 
     readonly mediaComments: MediaCommentViewModel[];
 }

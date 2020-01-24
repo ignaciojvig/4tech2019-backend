@@ -36,9 +36,9 @@ export class UserActivityService {
             );
         }
 
-        await this.userActivityRepository.insert(imageUploadDto);
+        const uploadedImage = await this.userActivityRepository.insert(imageUploadDto);
 
-        return 'Posted!: ' + filename;
+        return this.convertSingleImageToBase64(uploadedImage);
     }
 
     async getRecentImages(index: number) {
@@ -49,6 +49,13 @@ export class UserActivityService {
         const encodedImages = this.convertImagesToBase64(recentUploadedImages);
 
         return encodedImages;
+    }
+
+    convertSingleImageToBase64(imageDto: ImageUploadDto) {
+        return {
+            ...imageDto,
+            imgEncoded: readFileSync('../4tech2019-backend-images/' + imageDto.filename, 'base64'),
+        };
     }
 
     convertImagesToBase64(imagesDto: Media[]) {
@@ -73,14 +80,12 @@ export class UserActivityService {
 
         await this.userActivityRepository.update(media);
 
-        const likeCount = media.likes.length.toString();
-        this.websocketGateway.notifyConnectedClients(media._id, likeCount);
+        this.websocketGateway.notifyConnectedClients(media._id, media.userId);
 
         return 'Activity successfully liked/disliked!';
     }
 
     async postComment(postCommentDto: MediaCommentViewModel) {
-
         const post = await this.userActivityRepository.getById(postCommentDto.mediaId);
         if (isNull(post)) { throw new BadRequestException('A Post with the given PostId could not be found'); }
 
@@ -89,10 +94,9 @@ export class UserActivityService {
 
         post.mediaComments = post.mediaComments.concat(new MediaCommentViewModel(postCommentDto.userId, user.userName, postCommentDto.comment));
 
-        await this.userActivityRepository.update(post);
+        const updated = await this.userActivityRepository.update(post);
 
-        return 'Comment successfully added to Activity';
-
+        return updated.mediaComments.pop();
     }
 
 }

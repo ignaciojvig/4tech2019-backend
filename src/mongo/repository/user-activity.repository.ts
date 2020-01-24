@@ -27,11 +27,12 @@ export class UserActivityRepository {
 
     async insert(imageUploadDto: ImageUploadDto): Promise<Media> {
         const newUser = this.mediaSchema(imageUploadDto);
-        return await newUser.save();
+        await newUser.save();
+        return this.getById(newUser._id);
     }
 
     async update(updateActivity: Media): Promise<Media> {
-        const updatedActivity = await this.mediaSchema.findOneAndUpdate({ _id: updateActivity._id }, updateActivity);
+        const updatedActivity = await this.mediaSchema.findOneAndUpdate({ _id: updateActivity._id }, updateActivity, { new: true });
         return await updatedActivity.save();
     }
 

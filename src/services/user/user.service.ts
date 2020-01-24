@@ -15,16 +15,15 @@ export class UserService {
 
     async getUserById(id: string): Promise<User | undefined> {
         const user = await this.userRepository.getById(id);
-        if (user) { return user; }
 
-        throw new BadRequestException(`There's no user with id ${id}`);
+        if (!user) {
+            throw new BadRequestException(`There's no user with id ${id}`);
+        }
+
+        return user;
     }
 
-    async findUser(userLogin: string, password: string): Promise<User | undefined> {
-        return await this.userRepository.getByLogin(userLogin, password);
-    }
-
-    async createUser(newUser: UserViewModel): Promise<string> {
+    async createUser(newUser: UserViewModel): Promise<User> {
 
         const alreadyExistingUser = await this.userRepository.getByLogin(newUser.userLogin, newUser.password);
 
@@ -32,9 +31,7 @@ export class UserService {
             throw new BadRequestException('This username already exists!');
         }
 
-        await this.userRepository.create(newUser);
-
-        return 'User successfully created!';
+        return await this.userRepository.create(newUser);
     }
 
     async updateUser(updateUser: UserViewModel, id: string): Promise<string> {

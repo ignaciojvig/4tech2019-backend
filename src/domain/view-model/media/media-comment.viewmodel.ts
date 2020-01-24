@@ -6,6 +6,7 @@ export class MediaCommentViewModel {
         this.userId = userId;
         this.userName = userName;
         this.comment = comment;
+        this.timestamp = new Date();
     }
 
     @ApiProperty({ description: 'UserId from the User that\'s posting a comment', minLength: 24, maxLength: 24 })
@@ -24,5 +25,7 @@ export class MediaCommentViewModel {
     @IsNotEmpty()
     @Length(1, 50)
     readonly comment: string;
+
+    readonly timestamp: Date;
 
 }

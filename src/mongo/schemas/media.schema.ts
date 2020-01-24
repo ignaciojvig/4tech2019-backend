@@ -16,10 +16,7 @@ const MediaCommentSchema = new mongoose.Schema({
     userId: String,
     userName: String,
     comment: String,
-    timestamp: {
-        type: Date,
-        default: Date.now(),
-    },
+    timestamp: Date,
 });
 
 export const MediaSchema = new mongoose.Schema({
@@ -27,9 +24,6 @@ export const MediaSchema = new mongoose.Schema({
     userName: String,
     filename: String,
     likes: [String],
-    timestamp: {
-        type: Date,
-        default: Date.now(),
-    },
+    timestamp: Date,
     mediaComments: [MediaCommentSchema],
 });

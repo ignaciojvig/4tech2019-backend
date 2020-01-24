@@ -23,7 +23,12 @@ mongoose.set('debug', true);
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017/admin', { useNewUrlParser: true, useUnifiedTopology: true }),
+    MongooseModule.forRoot('mongodb://localhost:27017/admin',
+      {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false,
+      }),
     MongooseModule.forFeature([
       { name: 'User', schema: UserSchema },
       { name: 'Media', schema: MediaSchema },
